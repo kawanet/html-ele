@@ -9,7 +9,7 @@ MJS_CONFIG := ./rollup-mjs.config.ts
 CJS_CONFIG := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST)
 
 ####
 
@@ -18,26 +18,28 @@ all: $(ALL)
 $(PKG_DST):
 	@mkdir -p $(dir $@)
 	echo '{"type":"commonjs"}' > $@
+	@ls -l $@
+	@echo ""
 
 $(MJS_DST): $(MJS_CONFIG) $(SRC)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 200000 ]
+	[ "$$(wc -c < $@)" -lt 10000 ]
 	@echo ""
 
 $(CJS_DST): $(CJS_CONFIG) $(SRC)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 200000 ]
+	[ "$$(wc -c < $@)" -lt 10000 ]
 	@echo ""
 
-$(MINJS_DST): $(MINJS_CONFIG) $(SRC)
+$(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(PKG_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 200000 ]
+	[ "$$(wc -c < $@)" -lt 10000 ]
 	@echo ""
 
 test: all
