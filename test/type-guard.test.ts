@@ -1,0 +1,41 @@
+import "./jsdom-helper.ts"
+import {strict as assert} from "node:assert"
+import {describe, it} from "node:test"
+import {DIV} from "../src/index.ts"
+
+describe("TypeScript", () => {
+    it(`type guard`, () => {
+        let num: number = 0
+        const oh = {outerHTML: "foo"}
+
+        // language=HTML
+        assert.equal(DIV`
+            <div>${num && oh}</div>
+        `.outerHTML.trim(), "<div>0</div>") // not guarded yet
+
+        // language=HTML
+        assert.equal(/* @ts-expect-error */ DIV`
+            <div>${num || [oh]}</div>
+        `.outerHTML.trim(), "<div>foo</div>")
+
+        // language=HTML
+        assert.equal(DIV`
+            <div>${num && [oh]}</div>
+        `.outerHTML.trim(), "<div>0</div>") // not guarded yet
+
+        // language=HTML
+        assert.equal(/* @ts-expect-error */ DIV`
+            <div>${num || oh}</div>
+        `.outerHTML.trim(), "<div>foo</div>")
+
+        // language=HTML
+        assert.equal(DIV`
+            <div>${!num && oh}</div>
+        `.outerHTML.trim(), "<div>foo</div>")
+
+        // language=HTML
+        assert.equal(/* @ts-expect-error */ DIV`
+            <div>${!num || oh}</div>
+        `.outerHTML.trim(), "<div>true</div>")
+    })
+})

@@ -1,0 +1,49 @@
+{
+  "name": "html-ele",
+  "description": "εLε - HTMLElement from type-safe template literals",
+  "version": "0.0.1",
+  "author": "Kawanet",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.2",
+    "@rollup/plugin-sucrase": "^5.0.2",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^24.7.2",
+    "jsdom": "^27.0.0",
+    "rollup": "^4.52.4",
+    "terser": "^5.44.0",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/html-ele.cjs",
+      "source": "./src/index.ts",
+      "import": {
+        "types": "./types/html-ele.d.ts",
+        "default": "./dist/html-ele.mjs"
+      }
+    }
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "browser/import.mjs",
+    "dist/html-ele.cjs",
+    "dist/html-ele.min.js",
+    "dist/html-ele.mjs",
+    "src/",
+    "types/"
+  ],
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "make -C builder",
+    "fixpack": "fixpack",
+    "prepack": "make -C builder clean all test",
+    "test": "node --test"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "types": "types/html-ele.d.ts"
+}
