@@ -1,6 +1,6 @@
 {
   "name": "html-ele",
-  "description": "εLε - HTMLElement from type-safe template literals",
+  "description": "εLε - Native HTMLElement builder from type-safe template literals",
   "version": "0.0.1",
   "author": "Kawanet",
   "devDependencies": {

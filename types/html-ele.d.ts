@@ -1,13 +1,20 @@
 /**
+ * εLε - Native HTMLElement builder from type-safe template literals
+ *
+ * @author kawanet
+ * @see https://github.com/kawanet/html-ele
+ */
+
+/**
  * Enveloped Node, which contains an HTML code snippet in its `outerHTML` property.
  */
-declare  type ENode = { outerHTML: string };
+declare type ENode = { outerHTML: string };
 
 /**
  * Allowed types for template literal interpolations.
  * Note that the boolean value `true` is intentionally excluded here.
  */
-declare  type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
+declare type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
 
 /**
  * @internal
@@ -47,7 +54,7 @@ type ELE<T extends HTMLElement = HTMLElement> = <A extends EV[]>(t: TemplateStri
  *
  * @example
  * const DIV = ele("div")
- * const span = DIV`<div>${v}</div>` => HTMLDivElement
+ * const div = DIV`<div>${v}</div>` // => HTMLDivElement
  */
 export const ele: ele
 
