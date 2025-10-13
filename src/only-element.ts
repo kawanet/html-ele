@@ -10,22 +10,22 @@ export const onlyElement = <T extends HTMLElement>(fragment: DocumentFragment, t
 
     const childElementCount = fragment.childElementCount
     if (childElementCount > 1) {
-        const tags = childrenTagNames(fragment, 5).join(", ")
+        const tags = childrenTagNames(fragment, 5)
         throw new Error(`Multiple children: ${tags}`)
     }
 
     if (tagName && elem.tagName !== tagName) {
-        throw new Error(`Invalid tagName: ${elem.tagName.toLowerCase()} != ${tagName.toLowerCase()}`)
+        throw new Error(`Invalid tagName: <${elem.tagName.toLowerCase()}> != <${tagName.toLowerCase()}>`)
     }
 
     return elem
 }
 
-const childrenTagNames = (parent: ParentNode, limit: number): string[] => {
+const childrenTagNames = (parent: ParentNode, limit: number): string => {
     const tags: string[] = []
     for (const node of parent.childNodes) {
         if (isElementNode(node)) {
-            tags.push(node.tagName.toLowerCase())
+            tags.push(`<${node.tagName.toLowerCase()}/>`)
         }
         if (tags.length > limit) {
             tags.shift()
@@ -33,5 +33,5 @@ const childrenTagNames = (parent: ParentNode, limit: number): string[] => {
             break
         }
     }
-    return tags
+    return tags.join("")
 }

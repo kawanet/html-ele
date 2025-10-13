@@ -74,6 +74,15 @@ describe("ELE", () => {
         `, /Multiple children:/)
     })
 
+    it(`Invalid tagName`, () => {
+        const STRONG = ele("strong")
+
+        // language=HTML
+        assert.throws(() => STRONG`
+            <b>FOO</b>
+        `, /Invalid tagName:/)
+    })
+
     it(`plain text`, () => {
         // language=HTML
         assert.throws(() => ELE`
