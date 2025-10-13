@@ -1,4 +1,3 @@
-import commonjs from "@rollup/plugin-commonjs"
 import nodeResolve from "@rollup/plugin-node-resolve"
 import sucrase from "@rollup/plugin-sucrase"
 import type {RollupOptions} from "rollup"
@@ -13,8 +12,6 @@ const rollupConfig: RollupOptions = {
     },
 
     plugins: [
-        commonjs(),
-
         nodeResolve({
             browser: true,
             preferBuiltins: false,

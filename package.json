@@ -4,7 +4,6 @@
   "version": "0.0.1",
   "author": "Kawanet",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.2",
     "@rollup/plugin-sucrase": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.4",
