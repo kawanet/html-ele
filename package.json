@@ -28,19 +28,19 @@
   "files": [
     "LICENSE",
     "README.md",
-    "browser/import.mjs",
     "dist/html-ele.cjs",
     "dist/html-ele.min.js",
     "dist/html-ele.mjs",
-    "src/",
-    "types/"
+    "dist/package.json",
+    "src/*.ts",
+    "types/*.d.ts"
   ],
   "license": "MIT",
   "main": "./src/index.ts",
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack",
-    "prepack": "make -C builder clean all test",
+    "prepare": "make -C builder clean all test",
     "test": "node --test"
   },
   "sideEffects": false,
