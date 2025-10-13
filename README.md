@@ -2,11 +2,11 @@
 
 [![Node.js CI](https://github.com/kawanet/html-ele/workflows/Node.js%20CI/badge.svg)](https://github.com/kawanet/html-ele/actions/)
 [![npm version](https://img.shields.io/npm/v/html-ele)](https://www.npmjs.com/package/html-ele)
-[![gzip size](https://img.badgesize.io/https://unpkg.com/html-ele/dist/html-ele.min.js?compression=gzip)](https://unpkg.com/html-ele/dist/html-ele.min.js)
+[![gzip size](https://img.badgesize.io/https://cdn.jsdelivr.net/npm/html-ele/dist/html-ele.min.js?compression=gzip)](https://cdn.jsdelivr.net/npm/html-ele/dist/html-ele.min.js)
 
 Native `HTMLElement` and `DocumentFragment` builder from type-safe template literals.
 
-- **Small runtime**: Under 3KB minified, under 2KB gzipped.
+- **Small runtime**: Under [3KB](https://cdn.jsdelivr.net/npm/html-ele/dist/html-ele.min.js) minified, under 2KB gzipped.
 - **Fast build**: No JSX/TSX transpilers required.
 - **XSS-safe**: Automatic escaping prevents injection attacks.
 - **Type-safe**: Full TypeScript support for developer-friendly experience.
@@ -97,14 +97,17 @@ interface ENode {
 }
 ```
 
-Use `ele()` method to create custom tags that return specific `HTMLElement` types:
+Use `ele("tagName")` method to create custom tags that return specific `HTMLElement` types:
 
 ```typescript
 const DIV = ele("div")
 const div = DIV`<div>${v}</div>` // => HTMLDivElement
 
 const INPUT = ele("input")
-const input = INPUT`<div>${v}</div>` // => HTMLInputElement
+const input = INPUT`<input type="text" name="email" value="${v}" />` // => HTMLInputElement
+
+const SELECT = ele("select")
+const select = SELECT`<select>${v}</select>` // => HTMLSelectElement
 ```
 
 ## TEMPLATING
