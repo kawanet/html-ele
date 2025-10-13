@@ -43,19 +43,11 @@ declare const ELE: ELE<HTMLElement>
 type ELE<T extends HTMLElement = HTMLElement> = <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => T
 
 /**
- * Convenience specialization of ELE for <div> elements.
- *
- * @example
- * const div = DIV`<div>${v}</div>` => HTMLDivElement
- */
-export const DIV: ELE<HTMLDivElement>
-
-/**
  * ε𝑳ε - Helper for creating a custom template literal tag function.
  *
  * @example
- * const SPAN = ele("span")
- * const span = SPAN`<span>${v}</span>` => HTMLSpanElement
+ * const DIV = ele("div")
+ * const span = DIV`<div>${v}</div>` => HTMLDivElement
  */
 export const ele: ele
 

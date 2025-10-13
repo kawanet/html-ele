@@ -21,8 +21,6 @@ export const ele: typeof declared.ele = <T extends HTMLElement>(tagName: string)
 
 export const ELE: typeof declared.ELE = /*#__PURE__*/ ele(null as string)
 
-export const DIV: typeof declared.DIV = /*#__PURE__*/ ele("div")
-
 export const HTML: typeof declared.HTML = function (t) {
     return eleTemplate(t as TemplateStringsArray, arguments as unknown as TemplateArguments)
 }

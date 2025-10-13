@@ -1,12 +1,13 @@
 import "./jsdom-helper.ts"
 import {strict as assert} from "node:assert"
 import {describe, it} from "node:test"
-import {DIV} from "../src/index.ts"
+import {ele} from "../src/index.ts"
 
 describe("TypeScript", () => {
     it(`type guard`, () => {
         let num: number = 0
         const oh = {outerHTML: "foo"}
+        const DIV = ele("div")
 
         // language=HTML
         assert.equal(DIV`

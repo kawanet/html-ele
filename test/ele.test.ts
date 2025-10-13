@@ -1,7 +1,7 @@
 import "./jsdom-helper.ts"
 import {strict as assert} from "node:assert"
 import {describe, it} from "node:test"
-import {DIV, ELE} from "../src/index.ts"
+import {ele, ELE} from "../src/index.ts"
 
 describe("ELE", () => {
     it("ELE`...`", () => {
@@ -14,6 +14,7 @@ describe("ELE", () => {
     })
 
     it("DIV`...`", () => {
+        const DIV = ele("div")
         const node = DIV`
             <div class="bar"></div>
         `
