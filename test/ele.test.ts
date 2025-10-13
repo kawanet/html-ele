@@ -1,7 +1,7 @@
 import "./jsdom-helper.ts"
 import {strict as assert} from "node:assert"
 import {describe, it} from "node:test"
-import {ele, ELE} from "../src/index.ts"
+import {ele, ELE} from "html-ele"
 
 describe("ELE", () => {
     it("ELE`...`", () => {

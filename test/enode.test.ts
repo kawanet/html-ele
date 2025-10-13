@@ -1,7 +1,7 @@
 import "./jsdom-helper.ts"
 import {strict as assert} from "node:assert"
 import {describe, it} from "node:test"
-import {EN} from "../src/index.ts"
+import {EN} from "html-ele"
 
 describe("ENode", () => {
     const equal = (actual: ReturnType<typeof EN>, expected: string) => {
