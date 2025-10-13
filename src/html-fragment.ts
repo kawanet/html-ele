@@ -1,13 +1,26 @@
 import {createElement} from "./create-element.ts"
 
-const pickTagName = (code: string): string => ("string" === typeof code) && code.match(/<(?![.-])([A-Z0-9._:-]+)/i)?.[1]?.toUpperCase()
+const pickTagName = (code: string): string => {
+    const matched = ("string" === typeof code) && code.match(/<(?![.-])([A-Z0-9._:-]+)/i)
+    if (matched) return matched[1]
+}
 
 const resultCache: Record<string, [boolean]> = {}
 
-const isAvailableTag = (tagName: string): boolean => (resultCache[tagName] || (resultCache[tagName] = [testAvailability(tagName)]))[0]
+const isAvailableTag = (tagName: string): boolean => {
+    tagName = tagName.toLowerCase()
+    return (resultCache[tagName] || (resultCache[tagName] = [testAvailability(tagName)]))[0]
+}
 
-const testAvailability = (tagName: string): boolean => (docFragment(`<${tagName}></${tagName}>`).firstElementChild?.tagName.toUpperCase() === tagName)
+const testAvailability = (tagName: string): boolean => {
+    const fragment = docFragment(`<${tagName}></${tagName}>`)
+    const elem = fragment && fragment.firstElementChild
+    if (elem) return elem.tagName.toLowerCase() === tagName
+}
 
+/**
+ * Default parser using innerHTML property for most elements like <div>, etc.
+ */
 const docFragment = (code: string): DocumentFragment => {
     const template = createElement<HTMLTemplateElement>("template")
     template.innerHTML = code
@@ -15,7 +28,8 @@ const docFragment = (code: string): DocumentFragment => {
 }
 
 /**
- * Fallback render using createElement() for any other tags: such as <html>, <head>, <body>, etc.
+ * Fallback parser using createElement() for the other elements like <html>, <head>, <body>, etc.
+ * Limitation: The top-level tag must not appear in its nested children to avoid parser errors.
  */
 const docFragmentFB = (code: string): DocumentFragment => {
     const split = code.split(/<((?![.-])[A-Z0-9._:-]+)((?![A-Z0-9._:-])(?:[^>"'/]|"[^"]*"|'[^']*')+)?(?:>(.*?)(?:<\/\1[^<>]*>)|\/>)/sig)
@@ -37,8 +51,9 @@ const docFragmentFB = (code: string): DocumentFragment => {
         const elem = createElement(tagName)
 
         if (attributes) {
-            const namedNodeMap = docFragment(`<template ${attributes}/>`)?.firstElementChild?.attributes
-            for (const attr of namedNodeMap) {
+            const fragment = docFragment(`<template ${attributes}/>`)
+            const parsed = fragment && fragment.firstElementChild
+            if (parsed) for (const attr of parsed.attributes) {
                 elem.setAttribute(attr.name, attr.value)
             }
         }

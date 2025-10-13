@@ -29,7 +29,7 @@ interface eleTemplate {
 
 export const eleTemplate = ((t, args, useENode) => {
     if (!isTemplateStringsArray(t)) {
-        throw new Error(`Invalid Template Literals: ${t?.[0]}`)
+        throw new Error(`Invalid Template Literals: ${t && t[0]}`)
     }
 
     const templates: Record<string, Node> = {}
