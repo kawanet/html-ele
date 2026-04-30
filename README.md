@@ -163,10 +163,19 @@ const render = (ctx) => (ELE`
 
 ## VALUE CONVERSION
 
-Template variables accept primitive values like `string`, `number`, etc.
-They output an empty string `""` when `null`, `undefined`, or `false` values given.
-Note that the primitive value `true` is not accepted.
-Use explicit values or conditional expressions to control the output.
+Template variables accept primitive values such as `string` and `number`.
+At runtime, `null`, `undefined`, and `false` all render as an empty string.
+
+The boolean `true` is intentionally rejected by the type system so that
+`${cond && 'value'}` is the only safe way to write a conditional:
+
+- `${cond && value}` narrows to `false | value` and type-checks. `false`
+  drops out at runtime, leaving just the value when the condition holds.
+- `${cond || value}` can yield `true` (which is excluded from `EV`), so it
+  fails to compile.
+
+Use this pattern when the goal is *conditional inclusion*. To display a
+value that depends on a boolean, map it to a string explicitly:
 
 ```js
 // DON'T
@@ -180,7 +189,7 @@ render({bool: false}); // => '<span>NO</span>'
 ```
 
 ```js
-// DON'T
+// DON'T (`||` can yield `true`, which is rejected by the type checker)
 const render = (ctx) => EN`<span>${ctx.bool || "it is falsy"}</span>`
 render({bool: false}); // => '<span>it is falsy</span>'
 
