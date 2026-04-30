@@ -3,6 +3,9 @@
   "description": "εLε - Native HTMLElement builder from type-safe template literals",
   "version": "0.0.1",
   "author": "Kawanet",
+  "bugs": {
+    "url": "https://github.com/kawanet/html-ele/issues"
+  },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-multi-entry": "^7.0.0",
@@ -40,8 +43,24 @@
     "src/*.ts",
     "types/*.d.ts"
   ],
+  "homepage": "https://github.com/kawanet/html-ele#readme",
+  "keywords": [
+    "browser",
+    "documentfragment",
+    "dom",
+    "html",
+    "htmlelement",
+    "tagged-template",
+    "template-literal",
+    "typescript",
+    "xss"
+  ],
   "license": "MIT",
   "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawanet/html-ele.git"
+  },
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack",
