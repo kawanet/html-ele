@@ -1,5 +1,5 @@
 /**
- * Override the global `document` object when running on Node.js environment.
+ * Overrides the global `document` object when running in a Node.js environment.
  *
  * @example
  * const {JSDOM} = await import("jsdom")
