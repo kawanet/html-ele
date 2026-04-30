@@ -16,11 +16,13 @@ declare type ENode = { outerHTML: string };
  * Types that may be interpolated into a template literal.
  *
  * The boolean `true` is intentionally excluded so the type system enforces
- * the safe conditional pattern. `${cond && value}` narrows to `false | value`
- * and type-checks; `${cond || value}` can yield `true` and fails to compile.
+ * the safe conditional pattern when the operand is a `boolean`:
+ * `${bool && value}` narrows to `false | value` and type-checks, while
+ * `${bool || value}` widens to `boolean | value` and fails to compile.
  * At runtime, `false`, `null`, and `undefined` all render as an empty string,
- * making `${cond && 'class-name'}` the idiomatic way to conditionally include
- * content.
+ * making `${bool && 'class-name'}` the idiomatic way to conditionally include
+ * content. (Non-boolean operands are unaffected — `${str || "fallback"}`
+ * still works when `str` is `string | undefined`.)
  */
 declare type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
 

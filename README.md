@@ -166,15 +166,19 @@ const render = (ctx) => (ELE`
 Template variables accept primitive values such as `string` and `number`.
 At runtime, `null`, `undefined`, and `false` all render as an empty string.
 
-The boolean `true` is intentionally rejected by the type system so that
-`${cond && 'value'}` is the only safe way to write a conditional:
+The boolean `true` is intentionally rejected by the type system. This
+matters when the left side of `&&` or `||` is a `boolean`:
 
-- `${cond && value}` narrows to `false | value` and type-checks. `false`
+- `${bool && value}` narrows to `false | value` and type-checks. `false`
   drops out at runtime, leaving just the value when the condition holds.
-- `${cond || value}` can yield `true` (which is excluded from `EV`), so it
-  fails to compile.
+- `${bool || value}` widens to `boolean | value`. Because `true` is
+  excluded from `EV`, this fails to compile.
 
-Use this pattern when the goal is *conditional inclusion*. To display a
+(For non-boolean operands, both `&&` and `||` are fine as long as every
+possible result is an allowed type — for example, `${str || "fallback"}`
+works when `str` is `string | undefined`.)
+
+Use the `&&` form when the goal is *conditional inclusion*. To display a
 value that depends on a boolean, map it to a string explicitly:
 
 ```js
@@ -189,7 +193,7 @@ render({bool: false}); // => '<span>NO</span>'
 ```
 
 ```js
-// DON'T (`||` can yield `true`, which is rejected by the type checker)
+// DON'T (`bool || ...` widens to include `true`, rejected by the type checker)
 const render = (ctx) => EN`<span>${ctx.bool || "it is falsy"}</span>`
 render({bool: false}); // => '<span>it is falsy</span>'
 
