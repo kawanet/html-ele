@@ -9,7 +9,7 @@ Native `HTMLElement` and `DocumentFragment` builder from type-safe template lite
 - **Small runtime**: Under [3KB](https://cdn.jsdelivr.net/npm/html-ele/dist/html-ele.min.js) minified, under 2KB gzipped.
 - **Fast build**: No JSX/TSX transpilers required.
 - **XSS-safe**: Automatic escaping prevents injection attacks.
-- **Type-safe**: Full TypeScript support for developer-friendly experience.
+- **Type-safe**: Full TypeScript support for a developer-friendly experience.
 
 ## SYNOPSIS
 
@@ -36,9 +36,9 @@ const inputName = (ctx: Context): ENode => (EN`
 document.querySelector<HTMLElement>("#name-outer").innerHTML = inputName(ctx)
 ```
 
-Special characters used in the variable `name` is escaped for safe.
+Special characters in `name` are escaped automatically.
 
-`ele` accept `ENode` components, as well as the primitive values of `string`, `number`, etc.
+`ele` accepts `ENode` components as well as primitive values such as `string` and `number`.
 
 ```typescript
 // language=HTML
@@ -57,7 +57,7 @@ $country.addEventListener("change", () => (ctx.country = $country.value))
 document.querySelector<HTMLElement>("#country-outer").replaceChildren($country)
 ```
 
-Both `ELE` and `HTML` tags even accept native `Node`s of `HTMLElement`, `DocumentFragment`, etc.
+Both `ELE` and `HTML` tags also accept native DOM nodes such as `HTMLElement` and `DocumentFragment`.
 
 ```typescript
 // language=HTML
@@ -89,7 +89,7 @@ See [html-ele.d.ts](https://github.com/kawanet/html-ele/blob/main/types/html-ele
 
 - `ELE` tag returns an [HTMLElement](https://developer.mozilla.org/docs/Web/API/HTMLElement) object
 - `HTML` tag returns a [DocumentFragment](https://developer.mozilla.org/docs/Web/API/DocumentFragment) object
-- `EN` tag returns an Enveloped-Node `ENode` object as below
+- `EN` tag returns an Enveloped Node — an `ENode` object as shown below
 
 ```typescript
 interface ENode {
@@ -120,7 +120,7 @@ const render = (ctx) => EN`<p>Hello, ${ctx.name}!</p>`
 render({name: "Ken"}); // => '<p>Hello, Ken!</p>'
 ```
 
-HTML special characters escaped per default for safe:
+HTML special characters are escaped by default for safety:
 
 ```js
 const render = (ctx) => EN`<p>${ctx.html}</p>`
@@ -128,7 +128,7 @@ const render = (ctx) => EN`<p>${ctx.html}</p>`
 render({html: 'first line<br>second line'}); // => '<p>first line＆lt;br＆gt;second line</p>'
 ```
 
-Conditional section for plain string:
+Conditional section for a plain string:
 
 ```js
 const render = (ctx) => EN`<div class="${(ctx.value >= 10) && 'is-many'}">${ctx.value}</div>`
@@ -163,15 +163,28 @@ const render = (ctx) => (ELE`
 
 ## VALUE CONVERSION
 
-Template variables accept primitive values like `string`, `number`, etc.
-They output an empty string `""` when `null`, `undefined`, or `false` values given.
-Note that the primitive value `true` is not accepted.
-Use explicit values or conditional expressions to control the output.
+Template variables accept primitive values such as `string` and `number`.
+At runtime, `null`, `undefined`, and `false` all render as an empty string.
+
+The boolean `true` is intentionally rejected by the type system. This
+matters when the left side of `&&` or `||` is a `boolean`:
+
+- `${bool && value}` narrows to `false | value` and type-checks. `false`
+  drops out at runtime, leaving just the value when the condition holds.
+- `${bool || value}` widens to `boolean | value`. Because `true` is
+  excluded from `EV`, this fails to compile.
+
+(For non-boolean operands, both `&&` and `||` are fine as long as every
+possible result is an allowed type — for example, `${str || "fallback"}`
+works when `str` is `string | undefined`.)
+
+Use the `&&` form when the goal is *conditional inclusion*. To display a
+value that depends on a boolean, map it to a string explicitly:
 
 ```js
 // DON'T
 const render = (ctx) => EN`<span>${ctx.bool}</span>`
-render({bool: false}); // => '<span></span>' (the false value cause an empty string)
+render({bool: false}); // => '<span></span>' (`false` is rendered as an empty string)
 
 // DO
 const render = (ctx) => EN`<span>${ctx.bool ? "YES" : "NO"}</span>`
@@ -180,7 +193,7 @@ render({bool: false}); // => '<span>NO</span>'
 ```
 
 ```js
-// DON'T
+// DON'T (`bool || ...` widens to include `true`, rejected by the type checker)
 const render = (ctx) => EN`<span>${ctx.bool || "it is falsy"}</span>`
 render({bool: false}); // => '<span>it is falsy</span>'
 

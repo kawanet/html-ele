@@ -1,22 +1,28 @@
 {
   "name": "html-ele",
   "description": "εLε - Native HTMLElement builder from type-safe template literals",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Kawanet",
+  "bugs": {
+    "url": "https://github.com/kawanet/html-ele/issues"
+  },
   "devDependencies": {
-    "@rollup/plugin-alias": "^5.1.1",
+    "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-multi-entry": "^7.0.0",
     "@rollup/plugin-node-resolve": "^16.0.2",
     "@rollup/plugin-sucrase": "^5.0.2",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@types/jsdom": "^27.0.0",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@types/jsdom": "^28.0.0",
     "@types/node": "^24.7.2",
     "chai": "^6.2.0",
-    "jsdom": "^27.0.0",
+    "jsdom": "^29.0.0",
     "mocha": "^11.7.4",
     "rollup": "^4.52.4",
     "terser": "^5.44.0",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "exports": {
     ".": {
@@ -37,12 +43,29 @@
     "src/*.ts",
     "types/*.d.ts"
   ],
+  "homepage": "https://github.com/kawanet/html-ele#readme",
+  "keywords": [
+    "browser",
+    "documentfragment",
+    "dom",
+    "html",
+    "htmlelement",
+    "tagged-template",
+    "template-literal",
+    "typescript",
+    "xss"
+  ],
   "license": "MIT",
   "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawanet/html-ele.git"
+  },
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack",
-    "prepare": "make -C builder clean all test",
+    "prepack": "make -C builder test",
+    "prepare": "make -C builder clean all",
     "test": "node --test"
   },
   "sideEffects": false,

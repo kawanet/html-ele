@@ -19,7 +19,7 @@ const testAvailability = (tagName: string): boolean => {
 }
 
 /**
- * Default parser using innerHTML property for most elements like <div>, etc.
+ * Default parser that uses the `innerHTML` property for most elements such as `<div>`.
  */
 const docFragment = (code: string): DocumentFragment => {
     const template = createElement<HTMLTemplateElement>("template")
@@ -28,8 +28,8 @@ const docFragment = (code: string): DocumentFragment => {
 }
 
 /**
- * Fallback parser using createElement() for the other elements like <html>, <head>, <body>, etc.
- * Limitation: The top-level tag must not appear in its nested children to avoid parser errors.
+ * Fallback parser that uses `createElement()` for special elements such as `<html>`, `<head>`, and `<body>`.
+ * Limitation: the top-level tag must not appear among its nested children, or the parser will fail.
  */
 const docFragmentFB = (code: string): DocumentFragment => {
     const split = code.split(/<((?![.-])[A-Z0-9._:-]+)((?![A-Z0-9._:-])(?:[^>"'/]|"[^"]*"|'[^']*')+)?(?:>(.*?)(?:<\/\1[^<>]*>)|\/>)/sig)
