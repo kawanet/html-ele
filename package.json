@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^6.0.0",
+    "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-multi-entry": "^7.0.0",
     "@rollup/plugin-node-resolve": "^16.0.2",
     "@rollup/plugin-sucrase": "^5.0.2",
@@ -39,6 +40,8 @@
   "files": [
     "LICENSE",
     "README.md",
+    "browser/import.js",
+    "browser/package.json",
     "dist/html-ele.cjs",
     "dist/html-ele.min.js",
     "dist/html-ele.mjs",
