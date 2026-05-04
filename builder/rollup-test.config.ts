@@ -9,7 +9,7 @@ const rollupConfig: RollupOptions = {
     input: "../test/**/*.ts",
 
     output: {
-        file: "../build/test.browser.js",
+        file: "../test/test.browser.js",
         format: "iife",
         // `html-ele` resolves to the global `ele` exposed by
         // `dist/html-ele.min.js`'s IIFE; other imports (`node:test`,

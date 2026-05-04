@@ -9,7 +9,7 @@ PKG_DST := ../dist/package.json
 MJS_DST := ../dist/html-ele.mjs
 CJS_DST := ../dist/html-ele.cjs
 MINJS_DST := ../dist/html-ele.min.js
-TEST_DST := ../build/test.browser.js
+TEST_DST := ../test/test.browser.js
 
 MJS_CONFIG := ./rollup-mjs.config.ts
 CJS_CONFIG := ./rollup-cjs.config.ts
