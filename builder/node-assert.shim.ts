@@ -4,9 +4,11 @@
 // exports `strict` matching that surface.
 
 export const strict = {
-    // node:assert/strict-compatible `equal` (uses ===, like strict mode).
+    // node:assert/strict-compatible `equal`. Uses `Object.is`
+    // semantics, matching Node — so `equal(NaN, NaN)` passes and
+    // `equal(0, -0)` fails, both opposite of `===`.
     equal(actual: unknown, expected: unknown, message?: string): void {
-        if (actual !== expected) {
+        if (!Object.is(actual, expected)) {
             throw new Error(message || `expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
         }
     },
@@ -17,12 +19,14 @@ export const strict = {
     // counts.
     throws(block: () => void, expected?: RegExp | (new (...args: unknown[]) => Error)): void {
         let thrown: unknown;
+        let didThrow = false;
         try {
             block();
         } catch (e) {
             thrown = e;
+            didThrow = true;
         }
-        if (thrown === undefined) {
+        if (!didThrow) {
             throw new Error("expected to throw, did not");
         }
         if (expected instanceof RegExp) {
