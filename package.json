@@ -39,6 +39,8 @@
   "files": [
     "LICENSE",
     "README.md",
+    "browser/import.js",
+    "browser/package.json",
     "dist/html-ele.cjs",
     "dist/html-ele.min.js",
     "dist/html-ele.mjs",
