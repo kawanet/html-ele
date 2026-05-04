@@ -1,3 +1,4 @@
+import alias from "@rollup/plugin-alias"
 import multiEntry from "@rollup/plugin-multi-entry";
 import nodeResolve from "@rollup/plugin-node-resolve"
 import sucrase from "@rollup/plugin-sucrase"
@@ -10,13 +11,11 @@ const rollupConfig: RollupOptions = {
     output: {
         file: "../build/test.browser.js",
         format: "iife",
-        // Globals point at bindings that test-shim.ts installs on
-        // `globalThis` (assert, describe, it). Tests import from the
-        // node:* modules; rollup treats those module references as the
-        // runtime expressions below.
+        // `html-ele` resolves to the global `ele` exposed by
+        // `dist/html-ele.min.js`'s IIFE; other imports (`node:test`,
+        // `node:assert`) are aliased to local stub files below and so
+        // bundle inline rather than coming in as externals.
         globals: {
-            "node:assert": "{strict: assert}",
-            "node:test": "{describe, it, before, after}",
             "html-ele": "ele",
         },
     },
@@ -24,13 +23,22 @@ const rollupConfig: RollupOptions = {
     external: [
         "jsdom",
         "html-ele",
-        "node:assert",
-        "node:test",
     ],
 
     treeshake: false,
 
     plugins: [
+        // Redirect node:test / node:assert imports to the small
+        // browser stubs in `builder/`. Tests can therefore use
+        // identical source under both `node --test` (real node:*)
+        // and the browser (these stubs).
+        alias({
+            entries: [
+                {find: "node:test", replacement: new URL("./browser-test.ts", import.meta.url).pathname},
+                {find: "node:assert", replacement: new URL("./browser-assert.ts", import.meta.url).pathname},
+            ],
+        }),
+
         multiEntry(),
 
         nodeResolve({
