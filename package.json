@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^6.0.0",
+    "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-multi-entry": "^7.0.0",
     "@rollup/plugin-node-resolve": "^16.0.2",
     "@rollup/plugin-sucrase": "^5.0.2",
