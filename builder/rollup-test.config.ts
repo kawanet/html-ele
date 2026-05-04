@@ -10,6 +10,10 @@ const rollupConfig: RollupOptions = {
     output: {
         file: "../build/test.browser.js",
         format: "iife",
+        // Globals point at bindings that test-shim.ts installs on
+        // `globalThis` (assert, describe, it). Tests import from the
+        // node:* modules; rollup treats those module references as the
+        // runtime expressions below.
         globals: {
             "node:assert": "{strict: assert}",
             "node:test": "{describe, it, before, after}",

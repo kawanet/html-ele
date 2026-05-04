@@ -10,17 +10,19 @@ MJS_DST := ../dist/html-ele.mjs
 CJS_DST := ../dist/html-ele.cjs
 MINJS_DST := ../dist/html-ele.min.js
 TEST_DST := ../build/test.browser.js
-CHAI_DST := ../build/chai.browser.js
+SHIM_DST := ../build/test-shim.browser.js
 
 MJS_CONFIG := ./rollup-mjs.config.ts
 CJS_CONFIG := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
 TEST_CONFIG := ./rollup-test.config.ts
+SHIM_CONFIG := ./rollup-shim.config.ts
+SHIM_SRC := ./test-shim.ts
 
 # Documented runtime named exports that must be verified in every bundle.
 NAMED_EXPORTS := ele ELE HTML EN
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(CHAI_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(SHIM_DST)
 
 ####
 
@@ -60,11 +62,16 @@ $(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
 	[ "$$(wc -c < $@)" -lt 100000 ]
 	@echo ""
 
-$(CHAI_DST): ../node_modules/chai/register-assert.js ../node_modules/chai/index.js
+# Browser-side shim providing globalThis.describe / it / assert (the
+# four-symbol subset that the tests actually use). See test-shim.ts
+# for the rationale; together with the globals mapping in
+# rollup-test.config.ts this lets the same node:test sources run in
+# the browser without mocha or chai.
+$(SHIM_DST): $(SHIM_CONFIG) $(SHIM_SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
-	../node_modules/.bin/rollup --input $< --format iife --file $@
+	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 200000 ]
+	[ "$$(wc -c < $@)" -lt 5000 ]
 	@echo ""
 
 ####
