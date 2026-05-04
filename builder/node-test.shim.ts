@@ -46,6 +46,13 @@ export const it = (name: string, fn: () => unknown): void => {
     try {
         const result = fn();
         if (isThenable(result)) {
+            // Swallow any rejection so the browser/jsdom doesn't fire
+            // an `unhandledrejection` event on top of the explicit
+            // "unsupported" failure row below. The rejection content
+            // is discarded on purpose — the actual problem to flag is
+            // that the test is async, not whatever it would have
+            // rejected with.
+            (result as Promise<unknown>).catch(() => {});
             append("✘ " + label + ": async tests are not supported by this shim (got a thenable return value)", "red");
             return;
         }
@@ -66,6 +73,8 @@ export const before = (fn: () => unknown): void => {
     try {
         const result = fn();
         if (isThenable(result)) {
+            // Same rejection-swallow as in `it()` above.
+            (result as Promise<unknown>).catch(() => {});
             append("✘ before(): async hooks are not supported by this shim (got a thenable return value)", "red");
         }
     } catch (e) {
