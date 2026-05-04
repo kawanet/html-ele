@@ -4,6 +4,7 @@ SHELL := bash
 
 SRC := $(wildcard ../src/*.ts ../types/*.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
+TEST_SRC := $(wildcard ../test/*.ts)
 
 PKG_DST := ../dist/package.json
 MJS_DST := ../dist/html-ele.mjs
@@ -63,7 +64,7 @@ $(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
 	@test "$$(wc -c < $@)" -le $(MAX_BYTES) || { echo "ERROR: $@ exceeds $(MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
+$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(PKG_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
