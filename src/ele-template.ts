@@ -1,7 +1,12 @@
-import type {ENode, EV} from "html-ele"
+import type {ENode} from "html-ele"
 import {htmlFragment} from "./html-fragment.ts"
 
-type TemplateArguments = [TemplateStringsArray, ...EV[]];
+// EV is intentionally not exported from the public type contract; redefine
+// it here so the runtime side has its own copy. Keep in sync with
+// types/html-ele.d.ts.
+type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
+
+export type TemplateArguments = [TemplateStringsArray, ...EV[]];
 
 const AMP = {"<": "&lt;", "&": "&amp;", ">": "&gt;", "\"": "&quot;", "'": "&apos;"}
 

@@ -5,12 +5,14 @@
  * @see https://github.com/kawanet/html-ele
  */
 
+export {} // external module indicator
+
 /**
  * A plain object that holds an HTML snippet in its `outerHTML` property,
  * acting as a lightweight stand-in for a real DOM Node. The library refers
  * to this shape as an "Enveloped Node".
  */
-declare type ENode = { outerHTML: string };
+export type ENode = { outerHTML: string };
 
 /**
  * Types that may be interpolated into a template literal.
@@ -24,7 +26,7 @@ declare type ENode = { outerHTML: string };
  * content. (Non-boolean operands are unaffected — `${str || "fallback"}`
  * still works when `str` is `string | undefined`.)
  */
-declare type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
+type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
 
 /**
  * @internal
@@ -40,7 +42,7 @@ type _C3<T, X> = [T] extends [Exclude<EV, number>] ? X : [T] extends [Exclude<EV
  * @example
  * const fragment = HTML`<div>${v}</div>` // => DocumentFragment
  */
-declare const HTML: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => DocumentFragment
+export const HTML: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => DocumentFragment
 
 /**
  * Parses the template and returns an `ENode` — a plain object whose
@@ -50,7 +52,7 @@ declare const HTML: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A
  * @example
  * const node = EN`<div>${v}</div>` // => {outerHTML: string}
  */
-declare const EN: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => { outerHTML: string }
+export const EN: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => { outerHTML: string }
 
 /**
  * Parses the template and returns the first real `HTMLElement` it produces.
@@ -58,9 +60,9 @@ declare const EN: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>
  * @example
  * const element = ELE`<div>${v}</div>` // => HTMLElement
  */
-declare const ELE: ELE<HTMLElement>
+export const ELE: ELE<HTMLElement>
 
-type ELE<T extends HTMLElement = HTMLElement> = <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => T
+export type ELE<T extends HTMLElement = HTMLElement> = <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => T
 
 /**
  * ε𝑳ε - Creates a custom tag function that returns a specific `HTMLElement`
@@ -72,7 +74,7 @@ type ELE<T extends HTMLElement = HTMLElement> = <A extends EV[]>(t: TemplateStri
  */
 export const ele: ele
 
-interface ele {
+export interface ele {
     <N extends keyof HTMLElementTagNameMap>(tagName: N): ELE<HTMLElementTagNameMap[N]>;
 
     <T extends HTMLElement = HTMLElement>(tagName: string): ELE<T>

@@ -3,10 +3,8 @@
 // consumer would take. If the `exports.types` mapping ever breaks, the
 // build fails here.
 import type * as declared from "html-ele"
-import {eleTemplate} from "./ele-template.ts"
+import {eleTemplate, type TemplateArguments} from "./ele-template.ts"
 import {onlyElement} from "./only-element.ts"
-
-type TemplateArguments = [TemplateStringsArray, ...declared.EV[]];
 
 export type ENode = declared.ENode;
 
