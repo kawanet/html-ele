@@ -4,6 +4,13 @@
 // exports `strict` matching that surface.
 
 export const strict = {
+    // Truthy check. Mirrors `assert.ok(value, message?)` in node:assert.
+    ok(value: unknown, message?: string): void {
+        if (!value) {
+            throw new Error(message || `expected truthy, got ${JSON.stringify(value)}`);
+        }
+    },
+
     // node:assert/strict-compatible `equal`. Uses `Object.is`
     // semantics, matching Node — so `equal(NaN, NaN)` passes and
     // `equal(0, -0)` fails, both opposite of `===`.
