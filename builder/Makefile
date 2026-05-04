@@ -4,13 +4,13 @@ SHELL := bash
 
 SRC := $(wildcard ../src/*.ts ../types/*.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
+TEST_SRC := $(wildcard ../test/*.ts)
 
 PKG_DST := ../dist/package.json
 MJS_DST := ../dist/html-ele.mjs
 CJS_DST := ../dist/html-ele.cjs
 MINJS_DST := ../dist/html-ele.min.js
-TEST_DST := ../build/test.browser.js
-CHAI_DST := ../build/chai.browser.js
+TEST_DST := ../test/test.browser.js
 
 MJS_CONFIG := ./rollup-mjs.config.ts
 CJS_CONFIG := ./rollup-cjs.config.ts
@@ -20,7 +20,18 @@ TEST_CONFIG := ./rollup-test.config.ts
 # Documented runtime named exports that must be verified in every bundle.
 NAMED_EXPORTS := ele ELE HTML EN
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(CHAI_DST)
+# Bundle is small: this package has no production dependencies, builds
+# DOM nodes from template literals, and uses no Node builtins. Anything
+# noticeably larger than the cap means an accidental bundling of a
+# transitive dep — fail the build so it cannot slip in.
+MAX_BYTES := 10000
+
+# The browser test bundle inlines the test sources and the small
+# node:test / node:assert shims. ~15 KB today, capped well above for
+# headroom as more tests are added.
+TEST_MAX_BYTES := 100000
+
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)
 
 ####
 
@@ -36,35 +47,28 @@ $(MJS_DST): $(MJS_CONFIG) $(SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 10000 ]
+	@test "$$(wc -c < $@)" -le $(MAX_BYTES) || { echo "ERROR: $@ exceeds $(MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 $(CJS_DST): $(CJS_CONFIG) $(SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 10000 ]
+	@test "$$(wc -c < $@)" -le $(MAX_BYTES) || { echo "ERROR: $@ exceeds $(MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 $(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 10000 ]
+	@test "$$(wc -c < $@)" -le $(MAX_BYTES) || { echo "ERROR: $@ exceeds $(MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
+$(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(PKG_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 100000 ]
-	@echo ""
-
-$(CHAI_DST): ../node_modules/chai/register-assert.js ../node_modules/chai/index.js
-	@mkdir -p $(dir $@)
-	../node_modules/.bin/rollup --input $< --format iife --file $@
-	@ls -l $@
-	[ "$$(wc -c < $@)" -lt 200000 ]
+	@test "$$(wc -c < $@)" -le $(TEST_MAX_BYTES) || { echo "ERROR: $@ exceeds $(TEST_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 ####

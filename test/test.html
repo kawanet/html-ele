@@ -4,20 +4,16 @@
     <meta charset="utf-8"/>
     <title>ε𝑳ε - html-ele browser test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 1em; }
+        ul#results { list-style: none; padding: 0; margin: 0; }
+        ul#results li { font-family: monospace; padding: 2px 0; }
+    </style>
 </head>
 <body>
-<div id="mocha"></div>
-<script src="../node_modules/mocha/mocha.js"></script>
-<script class="mocha-init">
-    mocha.setup("bdd");
-    mocha.checkLeaks();
-</script>
+<h1>ε𝑳ε - html-ele browser test</h1>
+<ul id="results"></ul>
 <script src="../dist/html-ele.min.js"></script>
-<script src="../build/chai.browser.js"></script>
-<script src="../build/test.browser.js"></script>
-<script class="mocha-exec">
-    mocha.run();
-</script>
+<script src="./test.browser.js"></script>
 </body>
 </html>
