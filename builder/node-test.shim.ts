@@ -25,10 +25,19 @@ const append = (text: string, color: string): void => {
     root().appendChild(li);
 };
 
+// `warn` is for cases where the shim invoked the callback but
+// cannot determine a verdict — currently only async callbacks whose
+// returned Promise was not awaited. Renders as ⚠ in `darkorange` to
+// stand apart from the green ✔ pass and the red ✘ definite fail.
+const warn = (label: string, reason: string): void => {
+    append("⚠ " + label + ": " + reason, "darkorange");
+};
+
 // Detect a thenable (Promise-like) return value. The shim only
-// supports synchronous test functions; if a callback returns a
-// Promise we hard-fail rather than silently dropping it, since the
-// real `node:test` would await it and surface any rejection.
+// supports synchronous test functions; an async callback's body is
+// invoked but its returned Promise is not awaited, so the verdict
+// is unknown — we render it via `warn` rather than treat it as a
+// pass or a fail.
 const isThenable = (v: unknown): boolean =>
     !!v && (typeof v === "object" || typeof v === "function") && typeof (v as {then?: unknown}).then === "function";
 
@@ -48,12 +57,11 @@ export const it = (name: string, fn: () => unknown): void => {
         if (isThenable(result)) {
             // Swallow any rejection so the browser/jsdom doesn't fire
             // an `unhandledrejection` event on top of the explicit
-            // "unsupported" failure row below. The rejection content
-            // is discarded on purpose — the actual problem to flag is
-            // that the test is async, not whatever it would have
-            // rejected with.
+            // warn row below. The rejection content is discarded on
+            // purpose — the actual situation to flag is just that the
+            // test is async, not whatever it would have rejected with.
             (result as Promise<unknown>).catch(() => {});
-            append("✘ " + label + ": async tests are not supported by this shim (got a thenable return value)", "red");
+            warn(label, "invoked but not awaited (async tests are not supported by this shim)");
             return;
         }
         append("✔ " + label, "green");
@@ -63,19 +71,20 @@ export const it = (name: string, fn: () => unknown): void => {
     }
 };
 
-// `before(fn)` is invoked synchronously at registration time. A
-// thenable return value is rejected loudly (the shim does not
-// await), so callers needing different setup on Node vs the
-// browser should gate the body on `typeof document === "undefined"`
-// instead of writing an `async` callback. `after(fn)` is a no-op
-// since the browser test page is discarded after the run.
+// `before(fn)` is invoked synchronously at registration time. An
+// async body's `await` tail is not waited for; we only see what its
+// synchronous prefix did. Callers needing different setup on Node
+// vs the browser should gate the body on
+// `typeof document === "undefined"` rather than writing an `async`
+// callback. `after(fn)` is a no-op since the browser test page is
+// discarded after the run.
 export const before = (fn: () => unknown): void => {
     try {
         const result = fn();
         if (isThenable(result)) {
             // Same rejection-swallow as in `it()` above.
             (result as Promise<unknown>).catch(() => {});
-            append("✘ before(): async hooks are not supported by this shim (got a thenable return value)", "red");
+            warn("before()", "invoked but not awaited (async hooks are not supported by this shim)");
         }
     } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
