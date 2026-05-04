@@ -1,4 +1,4 @@
-import type {ENode, EV} from "../types/html-ele.d.ts"
+import type {ENode, EV} from "html-ele"
 import {htmlFragment} from "./html-fragment.ts"
 
 type TemplateArguments = [TemplateStringsArray, ...EV[]];

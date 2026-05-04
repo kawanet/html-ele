@@ -24,11 +24,9 @@
   },
   "exports": {
     ".": {
+      "types": "./types/html-ele.d.ts",
       "require": "./dist/html-ele.cjs",
-      "import": {
-        "types": "./types/html-ele.d.ts",
-        "default": "./dist/html-ele.mjs"
-      }
+      "import": "./dist/html-ele.mjs"
     }
   },
   "files": [
@@ -54,7 +52,7 @@
     "xss"
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./dist/html-ele.cjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/html-ele.git"
@@ -68,5 +66,5 @@
   },
   "sideEffects": false,
   "type": "module",
-  "types": "types/html-ele.d.ts"
+  "types": "./types/html-ele.d.ts"
 }
