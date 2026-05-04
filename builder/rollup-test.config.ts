@@ -3,6 +3,7 @@ import multiEntry from "@rollup/plugin-multi-entry";
 import nodeResolve from "@rollup/plugin-node-resolve"
 import sucrase from "@rollup/plugin-sucrase"
 import type {RollupOptions} from "rollup"
+import {fileURLToPath} from "node:url"
 import {showFiles} from "./show-files.ts"
 
 const rollupConfig: RollupOptions = {
@@ -34,8 +35,8 @@ const rollupConfig: RollupOptions = {
         // browser (these shims).
         alias({
             entries: [
-                {find: "node:test", replacement: new URL("./node-test.shim.ts", import.meta.url).pathname},
-                {find: "node:assert", replacement: new URL("./node-assert.shim.ts", import.meta.url).pathname},
+                {find: "node:test", replacement: fileURLToPath(new URL("./node-test.shim.ts", import.meta.url))},
+                {find: "node:assert", replacement: fileURLToPath(new URL("./node-assert.shim.ts", import.meta.url))},
             ],
         }),
 
