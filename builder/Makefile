@@ -2,7 +2,8 @@
 SHELL := bash
 .SHELLFLAGS := -eo pipefail -c
 
-SRC := $(wildcard ../src/*.ts ../types/*.ts)
+SRC := $(wildcard ../src/*.ts)
+TYPES := $(wildcard ../types/*.d.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
 TEST_SRC := $(wildcard ../test/*.ts)
 
@@ -109,13 +110,19 @@ smoke-minjs: $(MINJS_DST) $(PKG_DST)
 
 ####
 
-test: all smoke
+# Build, run smoke tests, and conditionally run full tests (tsc and node:test).
+test: all smoke $(TYPES)
+	@node -v | grep -qv "^v20" || echo "Node 20 detected: skipping full tests."
+	@ [ "$$npm_command" != "install" ] || echo "npm install detected: skipping full tests."
+	@node -v | grep -q "^v20" || [ "$$npm_command" = "install" ] || $(MAKE) test-ts
+
+test-ts:
 	../node_modules/.bin/tsc --noEmit
-	node --test ../test/*.test.ts
+	cd .. && node --test test/*.test.ts
 
 ####
 
 clean:
 	/bin/rm -fr $(ALL)
 
-.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs
+.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs test-ts

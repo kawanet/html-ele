@@ -1,8 +1,10 @@
-import type * as declared from "../types/html-ele.d.ts"
-import {eleTemplate} from "./ele-template.ts"
+// Self-reference via the package name so `tsc --noEmit` resolves these
+// types through `package.json` `exports` — the same path an external
+// consumer would take. If the `exports.types` mapping ever breaks, the
+// build fails here.
+import type * as declared from "html-ele"
+import {eleTemplate, type TemplateArguments} from "./ele-template.ts"
 import {onlyElement} from "./only-element.ts"
-
-type TemplateArguments = [TemplateStringsArray, ...declared.EV[]];
 
 export type ENode = declared.ENode;
 

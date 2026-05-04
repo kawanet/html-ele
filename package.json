@@ -19,16 +19,21 @@
     "terser": "^5.44.0",
     "typescript": "^5.9.3"
   },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22",
+      "onFail": "warn"
+    }
+  },
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   },
   "exports": {
     ".": {
+      "types": "./types/html-ele.d.ts",
       "require": "./dist/html-ele.cjs",
-      "import": {
-        "types": "./types/html-ele.d.ts",
-        "default": "./dist/html-ele.mjs"
-      }
+      "import": "./dist/html-ele.mjs"
     }
   },
   "files": [
@@ -54,7 +59,7 @@
     "xss"
   ],
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./dist/html-ele.cjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/html-ele.git"
@@ -62,11 +67,11 @@
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack",
-    "prepack": "make -C builder test",
-    "prepare": "make -C builder clean all",
-    "test": "node --test"
+    "prepack": "if node -v | grep -q '^v20'; then echo 'ERROR: packing is not allowed on Node 20'; exit 1; fi",
+    "prepare": "if node -v | grep -q '^v20'; then :; else make -C builder clean all test; fi",
+    "test": "make -C builder test"
   },
   "sideEffects": false,
   "type": "module",
-  "types": "types/html-ele.d.ts"
+  "types": "./types/html-ele.d.ts"
 }
