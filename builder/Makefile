@@ -1,3 +1,7 @@
+# Force bash so `set -o pipefail` works in the smoke-minjs recipe below.
+SHELL := bash
+.SHELLFLAGS := -eo pipefail -c
+
 SRC := $(wildcard ../src/*.ts ../types/*.ts)
 BUILDER_SRC := $(wildcard ./*.ts)
 
@@ -12,6 +16,9 @@ MJS_CONFIG := ./rollup-mjs.config.ts
 CJS_CONFIG := ./rollup-cjs.config.ts
 MINJS_CONFIG := ./rollup-minjs.config.ts
 TEST_CONFIG := ./rollup-test.config.ts
+
+# Documented runtime named exports that must be verified in every bundle.
+NAMED_EXPORTS := ele ELE HTML EN
 
 ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST) $(CHAI_DST)
 
@@ -60,10 +67,45 @@ $(CHAI_DST): ../node_modules/chai/register-assert.js ../node_modules/chai/index.
 	[ "$$(wc -c < $@)" -lt 200000 ]
 	@echo ""
 
-test: all
-	 node -e 'Promise.resolve().then(()=>import("$(MJS_DST)")).then(ele => ele.EN`<div/>`.outerHTML === `<div/>`).then(v => process.exit(+!v))'
-	 node -e 'Promise.resolve().then(()=>require("$(CJS_DST)")).then(ele => ele.EN`<div/>`.outerHTML === `<div/>`).then(v => process.exit(+!v))'
-	 node -e 'Promise.resolve().then(()=>require("$(MINJS_DST)")).then(ele => ele.EN`<div/>`.outerHTML === `<div/>`).then(v => process.exit(+!v))'
+####
+
+# Verify the bundles by importing/requiring the package itself.
+# This ensures the public entrypoints (exports/main) are correctly configured.
+# Note: process.argv.slice(1) is used because `node -e 'code' arg1 arg2`
+# results in process.argv = ['node', 'arg1', 'arg2'].
+smoke: smoke-mjs smoke-cjs smoke-minjs
+
+# MJS smoke test via public entrypoint.
+smoke-mjs: $(MJS_DST)
+	cd .. && node --input-type=module -e 'const m = await import("html-ele"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing MJS export:", k); process.exit(1); } console.log("MJS export OK:", k); }' $(NAMED_EXPORTS)
+
+# CJS smoke test via public entrypoint.
+smoke-cjs: $(CJS_DST)
+	cd .. && node --input-type=commonjs -e 'const m = require("html-ele"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing CJS export:", k); process.exit(1); } console.log("CJS export OK:", k); }' $(NAMED_EXPORTS)
+
+# Minified browser bundle smoke covers two consumer paths:
+#
+# (1) Browser shape: pipe the IIFE bundle plus a verification tail into
+#     `node -`. The IIFE assigns `var ele = {ele, ELE, HTML, EN}` (a
+#     namespace global, since rollup emits named exports under
+#     output.name = "ele"), so each documented export is reached as
+#     `ele[k]`. argv layout is [node, '-', name1, name2, ...] when
+#     stdin is the script, hence slice(2) (asymmetric with smoke-mjs /
+#     smoke-cjs which use slice(1)).
+#
+# (2) CJS shape: require() the same .min.js file. The bundle carries
+#     `outro: "if (typeof module !== 'undefined') { module.exports = exports }"`
+#     so it doubles as a CJS module (browserify-style consumers).
+#     Verifies the dist/package.json `{"type":"commonjs"}` override
+#     also takes effect (Node would otherwise treat .js under a
+#     `type: module` parent as ESM and fail).
+smoke-minjs: $(MINJS_DST) $(PKG_DST)
+	(cat $< && echo '; for (const k of process.argv.slice(2)) { if (typeof ele[k] !== "function") { console.error("missing browser export:", k); process.exit(1); } console.log("browser export OK:", k); }') | node - $(NAMED_EXPORTS)
+	cd .. && node --input-type=commonjs -e 'const m = require("./dist/html-ele.min.js"); for (const k of process.argv.slice(1)) { if (typeof m[k] !== "function") { console.error("missing minjs CJS export:", k); process.exit(1); } console.log("minjs CJS export OK:", k); }' $(NAMED_EXPORTS)
+
+####
+
+test: all smoke
 	../node_modules/.bin/tsc --noEmit
 	node --test ../test/*.test.ts
 
@@ -72,4 +114,4 @@ test: all
 clean:
 	/bin/rm -fr $(ALL)
 
-.PHONY: all clean test
+.PHONY: all clean test smoke smoke-mjs smoke-cjs smoke-minjs
