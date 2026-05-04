@@ -95,21 +95,37 @@ const runTest = async (test: TestEntry): Promise<void> => {
         const msg = e instanceof Error ? e.message : String(e);
         append("✘ " + test.label + ": " + msg, "red", ms(start));
     }
-    // append("⚠ " + test.label + ": " + reason, "darkorange"); // verdict 不明時の表示形 (skip / todo など将来の再利用候補)
 };
 
-const runHook = async (label: string, fn: Body): Promise<void> => {
+const runHook = async (label: string, fn: Body): Promise<boolean> => {
     try {
         await fn();
+        return true;
     } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         append("✘ " + label + ": " + msg, "red");
+        return false;
     }
 };
 
+// Drain order: every before-hook → tests (or ⚠ skip rows if any
+// before-hook failed) → every after-hook. Skipping the test bodies
+// matches node:test's "stop the suite when setup is broken" behavior
+// and prevents reporting false pass/fail against uninitialized state.
+// after-hooks still run so resource-cleanup that does not depend on
+// completed setup is still given a chance.
 const run = async (): Promise<void> => {
-    for (const fn of befores) await runHook("before()", fn);
-    for (const test of tests) await runTest(test);
+    let setupFailed = false;
+    for (const fn of befores) {
+        if (!(await runHook("before()", fn))) setupFailed = true;
+    }
+    for (const test of tests) {
+        if (setupFailed) {
+            append("⚠ " + test.label + ": skipped (before() failed)", "darkorange");
+        } else {
+            await runTest(test);
+        }
+    }
     for (const fn of afters) await runHook("after()", fn);
 };
 
