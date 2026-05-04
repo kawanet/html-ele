@@ -1,5 +1,5 @@
-// Browser-side stub for `node:assert`. Aliased into the test bundle
-// by `rollup-test.config.ts`. Tests source-import as
+// Browser-side shim for `node:assert`. Aliased into the test bundle
+// by the rollup test config. Tests source-import as
 // `import {strict as assert} from "node:assert"`, so this file
 // exports `strict` matching that surface.
 

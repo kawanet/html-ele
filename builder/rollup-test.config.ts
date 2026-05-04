@@ -28,14 +28,14 @@ const rollupConfig: RollupOptions = {
     treeshake: false,
 
     plugins: [
-        // Redirect node:test / node:assert imports to the small
-        // browser stubs in `builder/`. Tests can therefore use
-        // identical source under both `node --test` (real node:*)
-        // and the browser (these stubs).
+        // Redirect node:test / node:assert imports to the browser
+        // shims in `builder/`. Tests can therefore use identical
+        // source under both `node --test` (real node:*) and the
+        // browser (these shims).
         alias({
             entries: [
-                {find: "node:test", replacement: new URL("./browser-test.ts", import.meta.url).pathname},
-                {find: "node:assert", replacement: new URL("./browser-assert.ts", import.meta.url).pathname},
+                {find: "node:test", replacement: new URL("./node-test.shim.ts", import.meta.url).pathname},
+                {find: "node:assert", replacement: new URL("./node-assert.shim.ts", import.meta.url).pathname},
             ],
         }),
 

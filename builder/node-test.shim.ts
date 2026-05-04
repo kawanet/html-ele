@@ -1,10 +1,10 @@
-// Browser-side stub for `node:test`. Aliased into the test bundle by
-// `rollup-test.config.ts` so the test sources can import the same
+// Browser-side shim for `node:test`. Aliased into the test bundle by
+// the rollup test config so the test sources can import the same
 // names (`describe`, `it`, `before`, `after`) under both Node (real
 // node:test) and the browser (this file).
 //
-// Test results are rendered into `<ul id="results">` in
-// `test/test.html`.
+// Test results are rendered into `<ul id="results">` on the host
+// page (the element is created on demand if absent).
 
 const stack: string[] = [];
 
@@ -45,12 +45,12 @@ export const it = (name: string, fn: () => void): void => {
     }
 };
 
-// `before` / `after` are used by `test/jsdom-helper.ts` only to
-// install jsdom when `document` is missing (Node-side run). In the
-// browser the callback's body is a no-op via its own
-// `documentNotExist` guard, so synchronous invocation (and ignoring
-// any returned Promise) is safe. `after` is a no-op since the
-// browser test page is discarded after the run.
+// `before(fn)` is invoked synchronously at registration time and any
+// returned Promise is ignored. Callers that need different setup on
+// Node vs the browser should gate their bodies on something like
+// `typeof document === "undefined"` so the browser side becomes a
+// no-op. `after(fn)` is a no-op since the browser test page is
+// discarded after the run.
 export const before = (fn: () => unknown): void => {
     try {
         fn();
