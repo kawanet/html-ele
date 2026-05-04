@@ -29,8 +29,11 @@ NAMED_EXPORTS := ele ELE HTML EN
 MAX_BYTES := 10000
 
 # The browser test bundle inlines the test sources and the small
-# node:test / node:assert shims. ~15 KB today, capped well above for
-# headroom as more tests are added.
+# node:test / node:assert shims. The html-ele source itself is
+# externalized through `browser/import.js` and supplied at runtime by
+# `dist/html-ele.min.js` (loaded ahead of the bundle by test.html),
+# so this cap covers test code + shim wiring only. ~22 KB today,
+# capped well above for headroom as more tests are added.
 TEST_MAX_BYTES := 100000
 
 ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)

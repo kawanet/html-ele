@@ -17,8 +17,22 @@
 //   3. all `after()` hooks
 // This matches `node:test`'s "hooks bracket the suite" semantics
 // regardless of where in source order `before()` / `after()` is
-// declared. (Per-describe hook isolation is intentionally not
-// modelled — nested scopes share the same buckets.)
+// declared.
+//
+// Known limitations (intentional, kept simple):
+//   - Per-describe hook isolation is not modelled — nested scopes
+//     share the buckets.
+//   - Per-file isolation is not modelled either. When the test
+//     sources are concatenated by @rollup/plugin-multi-entry,
+//     every file's hooks and tests land in the same global bucket.
+//     A failing top-level `before()` therefore skips tests across
+//     all files, not only the file that declared it.
+//   - `options.timeout` rejects the awaited race on the test side
+//     but cannot cancel the underlying Promise (JavaScript has no
+//     cancellation primitive). A timed-out async test may still
+//     settle later and mutate state that subsequent tests observe.
+//     Real isolation would require AbortController participation
+//     from inside the test body.
 
 const stack: string[] = [];
 
