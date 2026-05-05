@@ -1,9 +1,9 @@
-**/*.browser.js
-**/*.cjs
-**/*.mjs
+*.cjs
+*.js
+*.mjs
+!browser/import.js
 *.js.gz
 *.js.map
-*.min.js
 *.swp
 *.tgz
 *~
