@@ -12,7 +12,7 @@ PKG_DST := ../dist/package.json
 MJS_DST := ../dist/html-ele.mjs
 CJS_DST := ../dist/html-ele.cjs
 MINJS_DST := ../dist/html-ele.min.js
-TEST_DST := ../browser/test/test.browser.js
+TEST_DST := ../browser/run-tests.js
 
 MJS_CONFIG := ./rollup-mjs.config.ts
 CJS_CONFIG := ./rollup-cjs.config.ts
@@ -31,7 +31,7 @@ MAX_BYTES := 10000
 # The browser test bundle inlines the test sources and the small
 # node:test / node:assert shims. The html-ele source itself is
 # externalized through `browser/import.js` and supplied at runtime by
-# `dist/html-ele.min.js` (loaded ahead of the bundle by browser/test/test.html),
+# `dist/html-ele.min.js` (loaded ahead of the bundle by browser/run-tests.html),
 # so this cap covers test code + shim wiring only. ~22 KB today,
 # capped well above for headroom as more tests are added.
 TEST_MAX_BYTES := 100000
@@ -74,7 +74,7 @@ $(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
 # rollup-test.config.ts. The package itself is *not* inlined —
 # `html-ele` resolves to `browser/import.js`, a 5-line CJS bridge
 # that re-exports the IIFE namespace global set by
-# `dist/html-ele.min.js` at runtime. Loaded by `browser/test/test.html`,
+# `dist/html-ele.min.js` at runtime. Loaded by `browser/run-tests.html`,
 # which side-loads `dist/html-ele.min.js` first. Hence the
 # dependency on $(MINJS_DST): without it, opening the test page
 # after a clean of just the test bundle would 404 on min.js.
