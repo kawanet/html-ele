@@ -1,6 +1,6 @@
 # ε𝑳ε - html-ele
 
-[![Node.js CI](https://github.com/kawanet/html-ele/workflows/Node.js%20CI/badge.svg)](https://github.com/kawanet/html-ele/actions/)
+[![Node.js CI](https://github.com/kawanet/html-ele/actions/workflows/nodejs.yml/badge.svg?branch=main)](https://github.com/kawanet/html-ele/actions/)
 [![npm version](https://img.shields.io/npm/v/html-ele)](https://www.npmjs.com/package/html-ele)
 [![gzip size](https://img.badgesize.io/https://cdn.jsdelivr.net/npm/html-ele/dist/html-ele.min.js?compression=gzip)](https://cdn.jsdelivr.net/npm/html-ele/dist/html-ele.min.js)
 
