@@ -1,8 +1,9 @@
-**/*.cjs
-**/*.mjs
+*.cjs
+*.js
+*.mjs
+!browser/import.js
 *.js.gz
 *.js.map
-*.min.js
 *.swp
 *.tgz
 *~
@@ -14,13 +15,11 @@
 .idea/codeStyles/
 .npmrc
 .pnpm-debug.log*
-browser/test/*.js
 dist/
 node_modules/
 nohup.out
 npm-debug.log*
 package-lock.json
 pnpm-lock.yaml
-test/**/*.js
 tmp/
 ~$*
