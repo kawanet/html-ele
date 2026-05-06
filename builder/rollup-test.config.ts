@@ -24,19 +24,9 @@ const rollupConfig: RollupOptions = {
     treeshake: false,
 
     plugins: [
-        // Redirect `node:test` / `node:assert` to the browser shims,
-        // `html-ele` to the published `browser/import.js` (a 5-line
-        // CJS bridge to the namespace global `ele` set by the IIFE
-        // in `dist/html-ele.min.js` — see browser/import.js), and
-        // `jsdom` to a no-op shim (jsdom is Node-only and the
-        // browser already has a real `document`, so jsdom-helper.ts
-        // never actually calls into it at runtime under a browser).
-        // The same import statements therefore resolve to:
-        //   - real `node:test` / `node:assert` / `html-ele` / `jsdom`
-        //     under `node --test` (Node + the package's own dist),
-        //   - the local shims / global bridge in the browser bundle,
-        // exercising the published `.min.js` instead of inlining the
-        // source via nodeResolve.
+        // Browser-side replacements: each entry's import resolves to
+        // the real module under `node --test` and to the local file
+        // listed below in the rollup test bundle.
         alias({
             entries: [
                 {find: "node:test", replacement: fileURLToPath(new URL("./node-test.shim.ts", import.meta.url))},
