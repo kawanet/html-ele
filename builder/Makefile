@@ -22,18 +22,18 @@ TEST_CONFIG := ./rollup-test.config.ts
 # Documented runtime named exports that must be verified in every bundle.
 NAMED_EXPORTS := ele ELE HTML EN
 
-# Bundle is small: this package has no production dependencies, builds
-# DOM nodes from template literals, and uses no Node builtins. Anything
-# noticeably larger than the cap means an accidental bundling of a
-# transitive dep — fail the build so it cannot slip in.
+# Bundle is small: this package is a single source file with no production
+# dependencies and uses no Node builtins. Anything noticeably larger means
+# an accidental bundling of a transitive dep — fail the build so it cannot
+# slip in.
 MAX_BYTES := 10000
 
 # Cap for the browser test bundle, which inlines the test sources
 # plus the node:test / node:assert shims. The package source itself
 # is externalized through browser/import.js so it does not count.
-TEST_MAX_BYTES := 100000
+TEST_MAX_BYTES := 30000
 
-ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(PKG_DST) $(TEST_DST)
+ALL := $(MJS_DST) $(CJS_DST) $(MINJS_DST) $(TEST_DST)
 
 # Build/test paths require Node's native TypeScript type-strip (default on
 # Node 22.18+). Older runtimes (e.g. Node 20) report BUILDABLE=NO and can
@@ -42,6 +42,7 @@ BUILDABLE := $(shell node -e 'console.log(process.features.typescript ? "YES" : 
 
 ####
 
+# Build all artifacts.
 all: is-buildable $(ALL)
 
 # Gate that fails loudly when type-strip is unavailable; consumed by `all`
@@ -53,12 +54,6 @@ is-buildable:
 # runtime so consumer install on Node 20 silently skips build/test.
 is-not-buildable:
 	@ [ "$(BUILDABLE)" = "NO" ]
-
-$(PKG_DST):
-	@mkdir -p $(dir $@)
-	echo '{"type":"commonjs"}' > $@
-	@ls -l $@
-	@echo ""
 
 $(MJS_DST): $(MJS_CONFIG) $(SRC) $(BUILDER_SRC)
 	@mkdir -p $(dir $@)
@@ -81,10 +76,13 @@ $(MINJS_DST): $(MINJS_CONFIG) $(SRC) $(BUILDER_SRC) $(PKG_DST)
 	@test "$$(wc -c < $@)" -le $(MAX_BYTES) || { echo "ERROR: $@ exceeds $(MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
-# Browser test bundle. Inlines test sources + node:test/assert/jsdom
-# shims; the package itself resolves to browser/import.js, a CJS
-# bridge to the IIFE global set by $(MINJS_DST) at runtime.
-# browser/tests.html side-loads $(MINJS_DST) first — hence the dep below.
+$(PKG_DST):
+	@mkdir -p $(dir $@)
+	echo '{"type":"commonjs"}' > $@
+	@ls -l $@
+	@echo ""
+
+# Browser test bundle loaded by browser/tests.html
 $(TEST_DST): $(TEST_CONFIG) $(SRC) $(BUILDER_SRC) $(TEST_SRC) $(BROWSER_SRC) $(MINJS_DST)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
@@ -120,6 +118,7 @@ smoke-minjs: $(MINJS_DST) $(PKG_DST)
 ####
 
 # Build, run smoke tests, and conditionally run full tests (tsc and node:test).
+# Consumer `npm install` skips the heavy test-ts step to keep install fast.
 test: all smoke $(TYPES)
 	@ [ "$$npm_command" != "install" ] || echo "npm install detected: skipping full tests."
 	@ [ "$$npm_command" = "install" ] || $(MAKE) test-ts
