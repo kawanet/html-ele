@@ -1,10 +1,6 @@
-// Test entry for `make test-shim` — parallels `browser/tests.html`.
-// Aliases node:test / node:assert to the local shims via
-// module.registerHooks() (same-thread, single-file), then dynamic-
-// imports each test file in argv. Dynamic import is required
-// because Node only evaluates the entry script — extra positionals
-// land in process.argv unused — and each `await` boundary lets the
-// shim drain state cleanly between files.
+// Node-side test entry for `make test-shim` (parallels
+// `browser/tests.html`). Aliases `node:test` / `node:assert` to the
+// local shims, then awaits each test file from argv.
 
 import {registerHooks} from "node:module";
 import {dirname, resolve as resolvePath} from "node:path";
@@ -21,11 +17,8 @@ registerHooks({
     resolve(specifier, context, nextResolve) {
         const target = ALIAS[specifier];
         const parent = context?.parentURL;
-        // Only intercept imports from project sources. Dependencies
-        // under node_modules (jsdom → undici, etc.) keep resolving
-        // to real node:test / node:assert; without this guard, our
-        // alias would redirect their imports to the .ts shim files
-        // and break their CJS require() chain.
+        // Alias only for project sources; deps under node_modules
+        // resolve to real node:test / node:assert.
         if (target && parent && parent.startsWith(projectRoot) && !parent.includes("/node_modules/")) {
             return nextResolve(pathToFileURL(target).href, context);
         }

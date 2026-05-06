@@ -46,8 +46,7 @@ const root = (): HTMLElement => {
     return el;
 };
 
-// Call sites pass color names as state-identifier keys (not display
-// values): browser uses them as CSS, Node maps to ANSI here.
+// Color name → ANSI SGR code for the Node output path.
 const ANSI_BY_COLOR: Record<string, string> = {
     green: "\x1b[32m",
     red: "\x1b[31m",
@@ -57,11 +56,7 @@ const ANSI_RESET = "\x1b[0m";
 const ANSI_DIM = "\x1b[2m";
 
 const append = (text: string, color: string, suffix?: string): void => {
-    // `window` (not `document`) so a `before()` hook that wires up
-    // jsdom — `globalThis.document = new JSDOM().window.document`
-    // — does not flip env mid-run; jsdom does not also assign
-    // `globalThis.window`, so this stays false on Node throughout.
-    if (typeof window !== "undefined") {
+    if (typeof document !== "undefined" && typeof window !== "undefined") {
         const li = document.createElement("li");
         li.textContent = text;
         li.style.color = color;
@@ -77,8 +72,6 @@ const append = (text: string, color: string, suffix?: string): void => {
         const r = c ? ANSI_RESET : "";
         const tail = suffix ? ` ${ANSI_DIM}${suffix}${ANSI_RESET}` : "";
         console.log(`${c}${text}${r}${tail}`);
-        // Flip exit code so `make test-shim` actually gates on
-        // failures — `console.log` alone leaves the process at 0.
         if (color === "red" || color === "darkorange") {
             process.exitCode = 1;
         }
@@ -148,19 +141,10 @@ const runHook = async (label: string, fn: Body): Promise<boolean> => {
     }
 };
 
-// Drain order: every before-hook → tests (or ⚠ skip rows if any
-// before-hook failed) → every after-hook. Skipping the test bodies
-// matches node:test's "stop the suite when setup is broken" behavior
-// and prevents reporting false pass/fail against uninitialized state.
-// after-hooks still run so resource-cleanup that does not depend on
-// completed setup is still given a chance.
-//
-// `tests` and `scheduled` reset at end of drain so each `await import()`
-// boundary in the Node test-shim path triggers its own drain. `befores`
-// / `afters` persist: shared helpers (e.g. a jsdom-helper) get imported
-// once and register hooks once, but every file's drain still needs to
-// re-run that setup/teardown. Browser drains exactly once so trailing
-// state is irrelevant there.
+// Drain: before-hooks → tests (or ⚠ skip rows when any before-hook
+// failed) → after-hooks. `tests` / `scheduled` reset at end so the
+// next registration cycle gets a fresh drain; `befores` / `afters`
+// persist across drains.
 const run = async (): Promise<void> => {
     let setupFailed = false;
     for (const fn of befores) {
