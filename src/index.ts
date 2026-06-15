@@ -15,18 +15,18 @@ export type ENode = declared.ENode
 export const ele: typeof declared.ele = <T extends HTMLElement>(tagName: string): declared.ELE<T> => {
     if (tagName) tagName = tagName.toUpperCase()
 
-    return ((t: TemplateStringsArray, ...args) => {
-        const fragment = eleTemplate(t, [t, ...args] as unknown as TemplateArguments)
+    return (function (t: TemplateStringsArray): T {
+        const fragment = eleTemplate(t, arguments as unknown as TemplateArguments)
         return onlyElement<T>(fragment, tagName)
     }) as declared.ELE<T>
 }
 
 export const ELE: typeof declared.ELE = /*#__PURE__*/ ele(null as string)
 
-export const HTML: typeof declared.HTML = function (t, ...args) {
-    return eleTemplate(t as TemplateStringsArray, [t, ...args] as unknown as TemplateArguments)
-}
+export const HTML = (function (t) {
+    return eleTemplate(t as TemplateStringsArray, arguments as unknown as TemplateArguments)
+}) as typeof declared.HTML
 
-export const EN: typeof declared.EN = function (t, ...args) {
-    return eleTemplate(t as TemplateStringsArray, [t, ...args] as unknown as TemplateArguments, true)
-}
+export const EN = (function (t) {
+    return eleTemplate(t as TemplateStringsArray, arguments as unknown as TemplateArguments, true)
+}) as typeof declared.EN
