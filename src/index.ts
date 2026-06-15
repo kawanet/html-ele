@@ -6,7 +6,7 @@ import type * as declared from "html-ele"
 import {eleTemplate, type TemplateArguments} from "./ele-template.ts"
 import {onlyElement} from "./only-element.ts"
 
-export type ENode = declared.ENode;
+export type ENode = declared.ENode
 
 /**
  * ε𝑳ε

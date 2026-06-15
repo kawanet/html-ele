@@ -12,7 +12,7 @@ export {} // external module indicator
  * acting as a lightweight stand-in for a real DOM Node. The library refers
  * to this shape as an "Enveloped Node".
  */
-export type ENode = { outerHTML: string };
+export type ENode = {outerHTML: string}
 
 /**
  * Types that may be interpolated into a template literal.
@@ -26,14 +26,14 @@ export type ENode = { outerHTML: string };
  * content. (Non-boolean operands are unaffected — `${str || "fallback"}`
  * still works when `str` is `string | undefined`.)
  */
-type EV = string | number | false | undefined | null | ENode | ENode[] | Node;
+type EV = string | number | false | undefined | null | ENode | ENode[] | Node
 
 /**
  * @internal
  */
-type _C1<A extends EV[]> = A & { [K in keyof A]: _C2<A[K]> };
-type _C2<T> = _C3<T, EV>;
-type _C3<T, X> = [T] extends [Exclude<EV, number>] ? X : [T] extends [Exclude<EV, ENode | ENode[] | Node>] ? X : never;
+type _C1<A extends EV[]> = A & {[K in keyof A]: _C2<A[K]>}
+type _C2<T> = _C3<T, EV>
+type _C3<T, X> = [T] extends [Exclude<EV, number>] ? X : [T] extends [Exclude<EV, ENode | ENode[] | Node>] ? X : never
 
 /**
  * Parses the template and returns a real `DocumentFragment` containing the
@@ -52,7 +52,7 @@ export const HTML: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]
  * @example
  * const node = EN`<div>${v}</div>` // => {outerHTML: string}
  */
-export const EN: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => { outerHTML: string }
+export const EN: <A extends EV[]>(t: TemplateStringsArray, ...args: _C1<[...A]>) => {outerHTML: string}
 
 /**
  * Parses the template and returns the first real `HTMLElement` it produces.
@@ -75,7 +75,7 @@ export type ELE<T extends HTMLElement = HTMLElement> = <A extends EV[]>(t: Templ
 export const ele: ele
 
 export interface ele {
-    <N extends keyof HTMLElementTagNameMap>(tagName: N): ELE<HTMLElementTagNameMap[N]>;
+    <N extends keyof HTMLElementTagNameMap>(tagName: N): ELE<HTMLElementTagNameMap[N]>
 
     <T extends HTMLElement = HTMLElement>(tagName: string): ELE<T>
 }
