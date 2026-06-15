@@ -10,7 +10,7 @@ export type TemplateArguments = [TemplateStringsArray, ...EV[]]
 
 const AMP = {"<": "&lt;", "&": "&amp;", ">": "&gt;", "\"": "&quot;", "'": "&apos;"}
 
-const escapeHTML = (v: string): string => v.replace(/([<&>"'])/g, ($1: keyof typeof AMP) => AMP[$1])
+const escapeHTML = (v: string): string => v.replace(/([<&>"'])/g, $1 => AMP[$1 as keyof typeof AMP])
 
 const isTemplateStringsArray = (v: any): v is TemplateStringsArray => (v && v.raw && (v.raw.length > 0))
 
