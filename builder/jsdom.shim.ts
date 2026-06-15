@@ -16,6 +16,6 @@ export class JSDOM {
         // return a fake object so any future code path that
         // accidentally reaches this in the browser fails loudly
         // instead of silently using a bogus document.
-        throw new Error("jsdom is not available in the browser test bundle");
+        throw new Error("jsdom is not available in the browser test bundle")
     }
 }
