@@ -51,9 +51,11 @@ const docFragmentFB = (code: string): DocumentFragment => {
         const elem = createElement(tagName)
 
         if (attributes) {
-            // <template> is not a void element, so a trailing "/" is not a self-closing
-            // marker: it would be swallowed into an unquoted attribute value. Pair the tag.
-            const fragment = docFragment(`<template ${attributes}></template>`)
+            // The tokenizer folds a "/" preceding ">" into an unquoted attribute value,
+            // so the probe has to reproduce the source terminator instead of picking one.
+            // innerHTML stays undefined only when the source used the "/>" form.
+            const slash = (innerHTML == null) ? "/" : ""
+            const fragment = docFragment(`<template ${attributes}${slash}></template>`)
             const parsed = fragment && fragment.firstElementChild
             if (parsed) for (const attr of parsed.attributes) {
                 elem.setAttribute(attr.name, attr.value)

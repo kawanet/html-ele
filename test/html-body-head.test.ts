@@ -96,4 +96,29 @@ describe("HTMLHtmlElement", () => {
         assert.equal(node.getAttribute("data-empty"), "")
         assert.equal(node.outerHTML, `<body class="bar" data-empty=""></body>`)
     })
+
+    /**
+     * A "/" written just before ">" is part of the unquoted value for the HTML
+     * tokenizer, so the fallback parser has to keep it rather than treat it as
+     * a tag terminator.
+     */
+    it(`<body> with a self-closing source tag`, () => {
+        const BODY = ele("body")
+
+        // language=HTML
+        const node = (BODY`<body data-x=y/>`)
+
+        assert.equal(node.tagName, "BODY")
+        assert.equal(node.getAttribute("data-x"), "y/")
+    })
+
+    it(`<body> with a self-closing source tag and an empty value`, () => {
+        const BODY = ele("body")
+
+        // language=HTML
+        const node = (BODY`<body data-x=/>`)
+
+        assert.equal(node.tagName, "BODY")
+        assert.equal(node.getAttribute("data-x"), "/")
+    })
 })
