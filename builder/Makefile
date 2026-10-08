@@ -12,7 +12,7 @@ PKG_DST := ../dist/package.json
 MJS_DST := ../dist/html-ele.mjs
 CJS_DST := ../dist/html-ele.cjs
 MINJS_DST := ../dist/html-ele.min.js
-BROWSER_TEST_DST := ../browser/tests/bundled.js
+BROWSER_TEST_DST := ../browser/tests/bundled.mjs
 BUILDER_TEST_DST := ./tests/bundled.mjs
 
 MJS_CONFIG := ./rollup-mjs.config.ts
